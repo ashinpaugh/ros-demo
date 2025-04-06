@@ -1,0 +1,46 @@
+networks:
+  sky-net:
+
+services:
+  ros-core:
+    image: ros_core
+    build:
+      context: ./src
+      target: ros_core
+    networks:
+      - sky-net
+    hostname: ros-core
+    environment:
+      - ROS_MASTER_URI=http://ros-core:11311/
+    stdin_open: true
+    tty: true
+
+  ros-node:
+    image: ros_node
+    build:
+      context: ./src
+      target: ros_node
+    depends_on:
+      - ros-core
+    networks:
+      - sky-net
+    environment:
+      - ROS_MASTER_URI=http://ros-core:11311/
+    command: python3 /usr/local/bin/ros-listener.py
+    stdin_open: true
+    tty: true
+
+  ros-commander:
+    image: ros_command
+    build:
+      context: ./src
+      target: ros_command
+    depends_on:
+      - ros-core
+    networks:
+      - sky-net
+    environment:
+      - ROS_MASTER_URI=http://ros-core:11311/
+    command: /bin/bash
+    stdin_open: true
+    tty: true
